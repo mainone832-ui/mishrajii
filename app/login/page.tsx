@@ -70,9 +70,9 @@ export default function LoginPage() {
           {/* Title with line decorators */}
           <div className="flex items-center justify-center gap-4">
             <div className="h-px w-8 sm:w-12 bg-cyan-500" />
-            <h1 className="text-2xl sm:text-3xl font-bold tracking-[0.3em] text-white drop-shadow-[0_0_10px_rgba(0,255,200,0.5)]">
-              Anonymous
-            </h1>
+        <h1 className="text-3xl sm:text-4xl font-bold tracking-[0.32em] text-[#8B0000] drop-shadow-[0_0_10px_rgba(255,0,0,0.6)]">
+  Anonymous
+</h1>
             <div className="h-px w-8 sm:w-12 bg-cyan-500" />
           </div>
 

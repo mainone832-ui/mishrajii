@@ -440,7 +440,7 @@ export default function AllDataPage() {
     <div className="min-h-screen bg-[#ffffff]">
       <header className="w-full bg-black">
         <div className="mx-auto flex w-full max-w-3xl items-center justify-between px-5 py-4 gap-4">
-          <Link href="/all" className="text-xl font-extrabold italic leading-none text-[#9ad83d] shrink-0">
+          <Link href="/all" className="text-xl font-extrabold italic leading-none text-[#8B0000] shrink-0">
             Anonymous
           </Link>
           <nav className="flex items-center gap-4 text-sm font-semibold text-white sm:gap-6 sm:text-base overflow-x-auto whitespace-nowrap scrollbar-hide">
